@@ -1,4 +1,5 @@
 #include <memory/memory.hh>
+#include <lucid.hh>
 #include <iostream>
 #include <fstream>
 
@@ -23,42 +24,37 @@ Memory :: Memory()
     memory_map.resize(0x05400000, 0);  // 0x05400000 = 64MB + 8MB + 16MB + 4MB
 }
 
-void Memory :: load_bootrom(const std::string& bootrom_file)
+void Memory :: load_bios(const std::string& bios_path)
 {
-    std::ifstream bootromFile(bootrom_file, std::ios::binary);
+    std::ifstream bios_file(bios_path, std::ios::binary);
 
-    if (!bootromFile.is_open()) {
-        std::cerr << "Failed to open bootrom file: " << bootrom_file << "\n";
+    if (!bios_file.is_open()) {
+        std::cerr << BOLDRED << "Failed to open the BIOS file: " << bios_path << RESET << "\n";
         return;
     }
     else
     {
-        std::cout << "Bootrom file opened successfully\n";
+        std::cout << BOLDBLUE << "BIOS file opened successfully...!" << RESET "\n";
     }
 
-    // Load bootrom into the memory at the appropriate location
-    // Boot ROM is from 0x00000000 to 0x03FFFFFF (2MB)
-    const uint32_t bootromBaseAddress = 0x00000000;
-    const uint32_t bootromEndAddress = bootromBaseAddress + 0x03FFFFFF;
-    uint32_t offset = bootromBaseAddress;
+    const uint32_t bios_base_addr = 0x00000000;
+    const uint32_t bios_end_addr = bios_base_addr + 0x03FFFFFF;
+    uint32_t offset = bios_base_addr;
 
-    while (!bootromFile.eof() && offset <= bootromEndAddress) {
+    while (!bios_file.eof() && offset <= bios_end_addr) {
         char byte;
-        bootromFile.read(&byte, 1);
+        bios_file.read(&byte, 1);
         memory_map[offset] = static_cast<uint8_t>(byte);
         offset++;
     }
 
-    bootromFile.close();
+    bios_file.close();
 }
 
 std::uint8_t Memory::read(uint32_t address) {
-    // Ensure the address is within the valid memory range
     if (address < memory_map.size()) {
         return memory_map[address];
     } else {
-        // Handle out-of-bounds access (you can choose the appropriate behavior)
-        // For simplicity, we'll return 0 for out-of-bounds access
         return 0;
     }
 }
