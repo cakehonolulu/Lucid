@@ -38,8 +38,12 @@ int main(int argc, char **argv)
     Memory memory;
     memory.load_bios(bios_file);
 
+    std::cout << "Memory Map Initialized" << std::endl;
+
     // Initialize CPU
     Cpu cpu(&memory);
+    std::cout << "CPU Initialized" << std::endl;
+
     cpu.run();
 
     return 0;
