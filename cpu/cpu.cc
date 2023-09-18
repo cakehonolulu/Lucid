@@ -166,12 +166,16 @@ uint16_t Cpu::fetch_opcode()
 
 void Cpu::parse_opcode(uint16_t opcode)
 {
-
     uint8_t function = (opcode >> 12) & 0xF;
+
+    std::int8_t imm = ((std::int8_t) (opcode & 0xFF));
+    std::uint8_t rn = ((opcode & 0x0F00) >> 8);
 
     switch (function) {
         case 0b1110:
-            std::cout << BOLDWHITE << "mov #" << +((std::int8_t)(opcode & 0xFF)) << ", r" << ((opcode & 0x0F00) >> 8) << "\n";
+            std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(rn) << "\n";
+            set_register(rn, (std::int32_t) imm);
+
             //exit(1);
             break;
 
