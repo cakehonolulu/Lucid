@@ -170,6 +170,7 @@ void Cpu::parse_opcode(uint16_t opcode)
 
     std::int8_t imm = ((std::int8_t) (opcode & 0xFF));
     std::uint8_t nnnn = ((opcode & 0x0F00) >> 8);
+    std::uint8_t mmmm = ((opcode & 0x00F0) >> 4);
 
     switch (function) {
 
@@ -181,6 +182,16 @@ void Cpu::parse_opcode(uint16_t opcode)
         case 0b0100:
             switch (opcode & 0x00FF)
             {
+                case 0b00001001:
+                    std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
+                    set_register(nnnn, get_register(nnnn) >> 2);
+                    break;
+
+                case 0b00011000:
+                    std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
+                    set_register(nnnn, get_register(nnnn) << 8);
+                    break;
+                    
                 case 0b00101000:
                     std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
                     set_register(nnnn, get_register(nnnn) << 16);
@@ -188,6 +199,27 @@ void Cpu::parse_opcode(uint16_t opcode)
 
                 default:
                     std::cerr << BOLDRED << "Unimplemented 0b0100 opcode variation : 0x" << format("{:02X}", (opcode & 0x00FF)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    print_registers();
+                    exit(1);
+                    break;
+            }
+            break;
+
+        /*
+            Opcode type:
+
+            0b0100nnnnmmmmxxxx
+        */
+        case 0b0110:
+            switch (opcode & 0x000F)
+            {
+                case 0b00001001:
+                    std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    set_register(nnnn, (get_register(mmmm) >> 16) | (get_register(mmmm) << 16));
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "Unimplemented 0b0110 opcode variation : 0x" << format("{:02X}", (opcode & 0x000F)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     print_registers();
                     exit(1);
                     break;
