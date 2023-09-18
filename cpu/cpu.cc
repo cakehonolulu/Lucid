@@ -169,14 +169,39 @@ void Cpu::parse_opcode(uint16_t opcode)
     uint8_t function = (opcode >> 12) & 0xF;
 
     std::int8_t imm = ((std::int8_t) (opcode & 0xFF));
-    std::uint8_t rn = ((opcode & 0x0F00) >> 8);
+    std::uint8_t nnnn = ((opcode & 0x0F00) >> 8);
 
     switch (function) {
-        case 0b1110:
-            std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(rn) << "\n";
-            set_register(rn, (std::int32_t) imm);
 
-            //exit(1);
+        /*
+            Opcode type:
+
+            0b0100nnnnxxxxxxxx / 0b0100mmmmxxxxxxxx
+        */
+        case 0b0100:
+            switch (opcode & 0x00FF)
+            {
+                case 0b00101000:
+                    std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
+                    set_register(nnnn, get_register(nnnn) << 16);
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "Unimplemented 0b0100 opcode variation : 0x" << format("{:02X}", (opcode & 0x00FF)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    print_registers();
+                    exit(1);
+                    break;
+            }
+            break;
+
+        /*
+            Opcode type:
+
+            0b1110nnnniiiiiiii
+        */
+        case 0b1110:
+            std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(nnnn) << "\n";
+            set_register(nnnn, (std::int32_t) imm);
             break;
 
         default:
