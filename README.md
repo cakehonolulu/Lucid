@@ -13,3 +13,11 @@ A work-in-progress Dreamcast Emulator
 ## Resources
 * SH-4 Manual
 https://www.renesas.com/us/en/document/mas/sh-4-software-manual
+* Memory Map Document #0
+http://archiv.sega-dc.de/munkeechuff/hardware/Memory.html
+* Memory Map Document #1
+https://dreamcast.wiki/Memory_map
+* Memory Map Document #2
+https://segaretro.org/images/8/8b/Dreamcast_Hardware_Specification_Outline.pdf
+* KallistiOS
+https://github.com/KallistiOS/KallistiOS

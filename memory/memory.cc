@@ -79,30 +79,3 @@ void Memory :: load_flash(const std::string& flash_path)
 
 	flash_file.close();
 }
-
-std::uint8_t Memory::read(uint32_t address, Sh4_Cpu *cpu) {
-
-	// Get MD Bit (Bit #30) from the Status Register
-	bool md_bit = cpu->get_md_bit();
-
-	bool p = (address >> 31) & 1;
-	bool alt = (address >> 30) & 1;
-	bool nc = (address >> 29) & 1;
-
-	// Calculate the physical address
-	std::uint32_t addr = (address & 0x1FFFFFFF);
-
-	if (addr >= 0x00000000 && addr <= 0x001FFFFF)
-	{
-		return bios[addr];
-	}
-	else if (addr >= 0x00200000 && addr <= 0x0023FFFF)
-	{
-		return flash[addr - 0x0023FFFF];
-	}
-	else
-	{
-		std::cout << BOLDRED << "memory_read8: Unhandled address 0x" << format("{:08X}", addr) << RESET << "\n";
-		exit(1);
-	}
-}

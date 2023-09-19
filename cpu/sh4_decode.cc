@@ -28,7 +28,7 @@ void Sh4_Decode::run()
 
 uint16_t Sh4_Decode::fetch_opcode()
 {
-    uint16_t opcode = (memory->read(cpu->get_pc() + 1, cpu) << 8) | memory->read(cpu->get_pc(), cpu);
+    uint16_t opcode = memory->read<uint16_t>(cpu->get_pc(), cpu);
     return opcode;
 }
 
@@ -80,10 +80,15 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             0101nnnnmmmmdddd
         */
         case 0b0101:
+        {
             std::cout << "mov.l @(" << +(dddd << 2) << ",r" << +(mmmm) << "),r" << +(nnnn) << std::endl;
-            // TODO/FIXME:
 
+            std::uint32_t value = memory->read<uint32_t>((cpu->get_register(mmmm) + (dddd << 2)), cpu);
+
+            cpu->set_register(nnnn, value);
             break;
+        }
+
 
         /*
             Opcode type:
