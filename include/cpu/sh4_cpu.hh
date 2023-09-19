@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory/memory.hh>
 #include <cstdint>
 
 #define	SR_INITIAL_VALUE		0b01110000000000000000000011110000
@@ -9,7 +8,7 @@
 #define	FPSCR_INITIAL_VALUE		0b00000000000001000000000000000001
 #define UNDEFINED_REG_VAL		(static_cast<uint32_t>(rand()) | (static_cast<uint32_t>(rand()) << 16))
 
-class Cpu {
+class Sh4_Cpu {
 
 private:
 	/*
@@ -163,10 +162,8 @@ private:
 
 public:
 
-	Memory *memory;
-
-	Cpu(Memory *memory_);
-	~Cpu();
+	Sh4_Cpu();
+	~Sh4_Cpu();
 
 	void remap_banking_registers();
 	std::uint32_t get_register(std::uint8_t index);
@@ -178,10 +175,10 @@ public:
 	std::uint32_t get_bank1_register(std::uint8_t index);
 	void set_bank1_register(std::uint8_t index, std::uint32_t value);
 
+	bool get_md_bit();
+
 	void print_registers();
 
-	void run();
-
-	std::uint16_t fetch_opcode();
-	void parse_opcode(std::uint16_t opcode);
+	void set_pc(std::uint32_t pc_);
+	std::uint32_t get_pc();
 };

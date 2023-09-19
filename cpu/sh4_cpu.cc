@@ -1,4 +1,4 @@
-#include <cpu/cpu.hh>
+#include <cpu/sh4_cpu.hh>
 #include <lucid.hh>
 #include <iostream>
 
@@ -10,11 +10,8 @@
     using fmt::format;
 #endif
 
-Cpu::Cpu(Memory *memory_)
+Sh4_Cpu::Sh4_Cpu()
 {
-    // MMU
-    memory = memory_;
-
     // CPU State
 
     // Bank 0 and 1 Registers R0-R7 start with undefined values
@@ -40,7 +37,7 @@ Cpu::Cpu(Memory *memory_)
     mach = UNDEFINED_REG_VAL;
     macl = UNDEFINED_REG_VAL;
     procedure_register = UNDEFINED_REG_VAL;
-    pc = 0x00000000;
+    pc = 0xA0000000;
     fpscr = FPSCR_INITIAL_VALUE;
     fpul = UNDEFINED_REG_VAL;
 
@@ -57,23 +54,16 @@ Cpu::Cpu(Memory *memory_)
     }
 }
 
-Cpu::~Cpu()
+Sh4_Cpu::~Sh4_Cpu()
 {
 }
 
-void Cpu::run()
+bool Sh4_Cpu::get_md_bit()
 {
-    while (true)
-    {
-        uint16_t opcode = fetch_opcode();
-
-        parse_opcode(opcode);
-
-        pc += 2;
-    }
+    return ((status_register >> 29) & 1);
 }
 
-void Cpu::print_registers()
+void Sh4_Cpu::print_registers()
 {
     std::cout << BOLDBLUE << "General Registers:" << RESET << std::endl;
 
@@ -110,7 +100,7 @@ void Cpu::print_registers()
     std::cout << "Floating-point Communication Register (FPUL):                " << BOLDWHITE << "0x" << format("{:08X}", fpul) << RESET << "\n";
 }
 
-void Cpu::remap_banking_registers()
+void Sh4_Cpu::remap_banking_registers()
 {
     for (std::uint8_t i = 0; i < 8; i++)
     {
@@ -118,128 +108,52 @@ void Cpu::remap_banking_registers()
     }
 }
 
-std::uint32_t Cpu::get_register(std::uint8_t index)
+std::uint32_t Sh4_Cpu::get_register(std::uint8_t index)
 {
     return *registers[index];
 }
 
-void Cpu::set_register(std::uint8_t index, std::uint32_t value)
+void Sh4_Cpu::set_register(std::uint8_t index, std::uint32_t value)
 {
     *registers[index] = value;
 }
 
-std::uint32_t Cpu::get_upper_register(std::uint8_t index)
+std::uint32_t Sh4_Cpu::get_upper_register(std::uint8_t index)
 {
     return registers_[index];
 }
 
-void Cpu::set_upper_register(std::uint8_t index, std::uint32_t value)
+void Sh4_Cpu::set_upper_register(std::uint8_t index, std::uint32_t value)
 {
     registers_[index] = value;
 }
 
-std::uint32_t Cpu::get_bank0_register(std::uint8_t index)
+std::uint32_t Sh4_Cpu::get_bank0_register(std::uint8_t index)
 {
     return registers_[index];
 }
 
-void Cpu::set_bank0_register(std::uint8_t index, std::uint32_t value)
+void Sh4_Cpu::set_bank0_register(std::uint8_t index, std::uint32_t value)
 {
     registers_[index] = value;
 }
 
-std::uint32_t Cpu::get_bank1_register(std::uint8_t index)
+std::uint32_t Sh4_Cpu::get_bank1_register(std::uint8_t index)
 {
     return bank1_registers[index];
 }
 
-void Cpu::set_bank1_register(std::uint8_t index, std::uint32_t value)
+void Sh4_Cpu::set_bank1_register(std::uint8_t index, std::uint32_t value)
 {
     bank1_registers[index] = value;
 }
 
-uint16_t Cpu::fetch_opcode()
+void Sh4_Cpu::set_pc(std::uint32_t pc_)
 {
-    uint16_t opcode = (memory->read(pc + 1) << 8) | memory->read(pc);
-    return opcode;
+    pc = pc_;
 }
 
-void Cpu::parse_opcode(uint16_t opcode)
+std::uint32_t Sh4_Cpu::get_pc()
 {
-    uint8_t function = (opcode >> 12) & 0xF;
-
-    std::int8_t imm = ((std::int8_t) (opcode & 0xFF));
-    std::uint8_t nnnn = ((opcode & 0x0F00) >> 8);
-    std::uint8_t mmmm = ((opcode & 0x00F0) >> 4);
-
-    switch (function) {
-
-        /*
-            Opcode type:
-
-            0b0100nnnnxxxxxxxx / 0b0100mmmmxxxxxxxx
-        */
-        case 0b0100:
-            switch (opcode & 0x00FF)
-            {
-                case 0b00001001:
-                    std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
-                    set_register(nnnn, get_register(nnnn) >> 2);
-                    break;
-
-                case 0b00011000:
-                    std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
-                    set_register(nnnn, get_register(nnnn) << 8);
-                    break;
-                    
-                case 0b00101000:
-                    std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
-                    set_register(nnnn, get_register(nnnn) << 16);
-                    break;
-
-                default:
-                    std::cerr << BOLDRED << "Unimplemented 0b0100 opcode variation : 0x" << format("{:02X}", (opcode & 0x00FF)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
-                    print_registers();
-                    exit(1);
-                    break;
-            }
-            break;
-
-        /*
-            Opcode type:
-
-            0b0100nnnnmmmmxxxx
-        */
-        case 0b0110:
-            switch (opcode & 0x000F)
-            {
-                case 0b00001001:
-                    std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
-                    set_register(nnnn, (get_register(mmmm) >> 16) | (get_register(mmmm) << 16));
-                    break;
-
-                default:
-                    std::cerr << BOLDRED << "Unimplemented 0b0110 opcode variation : 0x" << format("{:02X}", (opcode & 0x000F)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
-                    print_registers();
-                    exit(1);
-                    break;
-            }
-            break;
-
-        /*
-            Opcode type:
-
-            0b1110nnnniiiiiiii
-        */
-        case 0b1110:
-            std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(nnnn) << "\n";
-            set_register(nnnn, (std::int32_t) imm);
-            break;
-
-        default:
-            std::cerr << BOLDRED << "Unimplemented opcode: 0x" << format("{:04X}", opcode) << " (Function bits: 0b" << format("{:04b}", function) << ")" << RESET << "\n";
-            print_registers();
-            exit(1);
-            break;
-    }
+    return pc;
 }
