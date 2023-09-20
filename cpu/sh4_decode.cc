@@ -43,7 +43,45 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 
     switch (function) {
 
-         /*
+        /*
+            Opcode type:
+
+            0010nnnnxxxxxxxx
+        */
+        case 0b0000:
+            switch (opcode & 0x000F)
+            {
+                case 0b1010:
+                    /*
+                        To find which STx family of instructions we're dealing with, check the bit pattern
+                        at the high nibble of the LSB(yte) of the opcode
+                    */
+                    switch ((opcode & 0x00F0) >> 4)
+                    {
+                        case 0b0001:
+                            std::cout << BOLDWHITE << "sts macl, r" << +(nnnn) << "\n";
+                            cpu->set_register(nnnn, cpu->get_macl());
+                            break;
+
+                        default:
+                            std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0000 opcode variation 0x" << format("{:02X}", (opcode & 0x000F))
+                                << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), subfamily 0b" << format("{:04b}", ((opcode & 0x00F0) >> 4))
+                                << RESET << "\n";
+                            cpu->print_registers();
+                            exit(1);
+                            break;
+                    }
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0000 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    cpu->print_registers();
+                    exit(1);
+                    break;
+            }
+            break;
+
+        /*
             Opcode type:
 
             0010nnnnmmmmxxxx
