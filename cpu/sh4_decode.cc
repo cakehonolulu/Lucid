@@ -85,6 +85,16 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         /*
             Opcode type:
 
+            0001nnnnmmmmdddd
+        */
+        case 0b0001:
+            std::cout << "mov.l r" << +(mmmm) << ",@(" << +(dddd << 2) << ",r" << +(nnnn) << ")" << std::endl;
+            memory->write<uint32_t>(((dddd << 2) + cpu->get_register(nnnn)), cpu->get_register(mmmm), cpu);
+            break;
+
+        /*
+            Opcode type:
+
             0010nnnnmmmmxxxx
         */
         case 0b0010:

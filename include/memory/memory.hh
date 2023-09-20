@@ -42,6 +42,7 @@ public:
 
         T *from;
 
+//#ifdef MEMORY_DEBUG
         std::cout << "memory_read: Reading from 0x" << format("{:08X}", address) << ", P: " << +(p) << " , ALT: " 
         << +(alt) << " , NC: " << +(nc) << std::endl;
 
@@ -69,11 +70,14 @@ public:
         {
             std::cout << "             P4 read (";
         }
+//#endif
 
         // Calculate the physical address
         std::uint32_t p_addr = (address & 0x1FFFFFFF);
 
+//#ifdef MEMORY_DEBUG
         std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
+//#endif
 
         // $00000000 - $001FFFFF | Boot ROM (2MB)
         if (p_addr >= 0x00000000 && p_addr <= 0x001FFFFF)
@@ -118,7 +122,7 @@ public:
 
     template <typename T>
     void write(uint32_t address, T value, Sh4_Cpu *cpu) {
-        
+
         // Get MD Bit (Bit #30) from the Status Register
         bool md_bit = cpu->get_md_bit();
 
@@ -126,20 +130,54 @@ public:
         bool alt = (address >> 30) & 1;
         bool nc = (address >> 29) & 1;
 
-        // Calculate the physical address
-        std::uint32_t addr = (address & 0x1FFFFFFF);
+//#ifdef MEMORY_DEBUG
+        std::cout << "memory_write: Writing to 0x" << format("{:08X}", address) << ", P: " << +(p) << " , ALT: " 
+        << +(alt) << " , NC: " << +(nc) << std::endl;
 
-        if (addr >= 0x00000000 && addr <= 0x001FFFFF)
+        if (address >= 0 && address <= 0x7FFFFFFF)
         {
-            bios[addr] = value;
+            std::cout << "             U0/P0 read (";
         }
-        else if (addr >= 0x00200000 && addr <= 0x0023FFFF)
+        else
+        if (address >= 0x80000000 && address <= 0x9FFFFFFF)
         {
-            flash[addr] = value;
+            std::cout << "             P1 read (";
+        }
+        else
+        if (address >= 0xA0000000 && address <= 0xBFFFFFFF)
+        {
+            std::cout << "             P2 read (";
+        }
+        else
+        if (address >= 0xC0000000 && address <= 0xDFFFFFFF)
+        {
+            std::cout << "             P3 read (";
+        }
+        else
+        if (address >= 0xE0000000 && address <= 0xFFFFFFFF)
+        {
+            std::cout << "             P4 read (";
+        }
+//#endif
+
+        // Calculate the physical address
+        std::uint32_t p_addr = (address & 0x1FFFFFFF);
+
+//#ifdef MEMORY_DEBUG
+        std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
+//#endif
+
+        if (p_addr >= 0x00000000 && p_addr <= 0x001FFFFF)
+        {
+            bios[p_addr] = value;
+        }
+        else if (p_addr >= 0x00200000 && p_addr <= 0x0023FFFF)
+        {
+            flash[p_addr - 0x00200000] = value;
         }
         else
         {
-            std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", addr) << " with value 0x";
+            std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", p_addr) << " with value 0x";
             
             if (std::is_same<T, uint8_t>::value)
             {
