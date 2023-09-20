@@ -206,9 +206,24 @@ private:
 	std::uint32_t bcr1;
 
 	/*
+		Bus Control Register 2 (BCR2)
+	*/
+	std::uint32_t bcr2;
+
+	/*
+		Wait-State Control Register 1 (WCR1)
+	*/
+	std::uint32_t wcr1;
+
+	/*
 		Wait-State Control Register 2 (WCR2)
 	*/
 	std::uint32_t wcr2;
+
+	/*
+		Memory Control Register (MCR)
+	*/
+	std::uint32_t mcr;
 
 public:
 
@@ -253,6 +268,15 @@ public:
 	void set_bcr1(std::uint32_t bcr1_);
 	std::uint32_t get_bcr1();
 
+	void set_bcr2(std::uint32_t bcr2_);
+	std::uint32_t get_bcr2();
+
+	void set_wcr1(std::uint32_t wcr1_);
+	std::uint32_t get_wcr1();
+
 	void set_wcr2(std::uint32_t wcr2_);
 	std::uint32_t get_wcr2();
+
+	void set_mcr(std::uint32_t mcr_);
+	std::uint32_t get_mcr();
 };

@@ -75,6 +75,21 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     }
                     break;
 
+                case 0b1001:
+                    if (opcode == 0x0009)
+                    {
+                        std::cout << "nop" << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0000 opcode variation 0x" << format("{:02X}", (opcode & 0x000F))
+                                << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), subfamily 0b" << format("{:04b}", ((opcode & 0x00F0) >> 4))
+                                << RESET << "\n";
+                            cpu->print_registers();
+                            exit(1);
+                    }
+                    break;
+
                 case 0b1010:
                     /*
                         To find which STx family of instructions we're dealing with, check the bit pattern
@@ -190,6 +205,13 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                 case 0b00101000:
                     std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(nnnn) << 16);
+                    break;
+
+                case 0b00101011:
+                    std::cout << BOLDWHITE << "jmp @r" << +(nnnn) << "\n";
+                    SET_PC(GET_DELAY_PC());
+                    SET_DELAY_PC(GET_REG(nnnn));
+                    skip_pc_set = true;
                     break;
 
                 default:

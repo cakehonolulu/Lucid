@@ -197,17 +197,38 @@ public:
             std::cout << BOLDMAGENTA << "memory_write: Write to the CCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_ccr(value);
         }
-        else if (p_addr == 0x1F800004)
+        else if (p_addr == 0x1F800000)
         {
-            // TODO?
-            /*if (!(std::is_same<T, uint32_t>::value))
+            if (!(std::is_same<T, uint32_t>::value))
             {
                 std::cout << BOLDRED "memory_write: Tried to write to BCR1 register with a size != LONGWORD ...!" << RESET << "\n";
                 exit(1);
-            }*/
+            }
 
             std::cout << BOLDMAGENTA << "memory_write: Write to the BCR1 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_bcr1(value);
+        }
+        else if (p_addr == 0x1F800004)
+        {
+            if (!(std::is_same<T, uint16_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to BCR2 register with a size != WORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the BCR2 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_bcr2(value);
+        }
+        else if (p_addr == 0x1F800008)
+        {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to WCR1 register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the WCR1 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_wcr1(value);
         }
         else if (p_addr == 0x1F80000C)
         {
@@ -219,6 +240,17 @@ public:
 
             std::cout << BOLDMAGENTA << "memory_write: Write to the WCR2 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_wcr2(value);
+        }
+        else if (p_addr == 0x1F800014)
+        {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to MCR register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the MCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_mcr(value);
         }
         else
         {
