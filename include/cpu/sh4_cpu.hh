@@ -139,8 +139,11 @@ private:
 
 	/*
 		Program Counter (PC)
+
+		delay_pc is there in case of a branching instruction
 	*/
 	std::uint32_t pc;
+	std::uint32_t delay_pc;
 
 	/*
 		Floating-point Status/Control Register (FPSCR)
@@ -196,6 +199,9 @@ public:
 
 	void set_pc(std::uint32_t pc_);
 	std::uint32_t get_pc();
+
+	void set_delay_pc(std::uint32_t delay_pc_);
+	std::uint32_t get_delay_pc();
 	
 	void set_expevt(std::uint32_t expevt_);
 	std::uint32_t get_expevt();

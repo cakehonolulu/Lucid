@@ -21,8 +21,6 @@ void Sh4_Decode::run()
         uint16_t opcode = fetch_opcode();
 
         parse_opcode(opcode);
-
-        cpu->set_pc(cpu->get_pc() + 2);
     }
 }
 
@@ -41,6 +39,8 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
     std::uint8_t mmmm = ((opcode & 0x00F0) >> 4);
     std::uint8_t dddd = (std::uint8_t) ((opcode & 0x000F) >> 0);
     std::uint16_t dddddddd = (std::uint16_t) ((opcode & 0x00FF) >> 0);
+
+    bool skip_pc_set = false;
 
     switch (function) {
 
@@ -197,7 +197,14 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                 {
                     std::uint32_t pc_ = (dddddddd * 2) + cpu->get_pc() + 4;
                     std::cout << BOLDWHITE << "bf 0x" << format("{:08X}", pc_) << "\n";
-                    if (!cpu->get_tbit()) cpu->set_pc(pc_);
+
+                    if (!cpu->get_tbit())
+                    {
+                        cpu->set_pc(pc_);
+                        cpu->set_delay_pc(cpu->get_pc() + 2);
+
+                        skip_pc_set = true;
+                    }
                     break;
                 }
 
@@ -224,5 +231,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             cpu->print_registers();
             exit(1);
             break;
+    }
+    
+    if (!skip_pc_set)
+    {
+        cpu->set_pc(cpu->get_delay_pc());
+        cpu->set_delay_pc(cpu->get_delay_pc() + 2);
     }
 }

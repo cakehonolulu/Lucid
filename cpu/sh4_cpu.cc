@@ -38,6 +38,7 @@ Sh4_Cpu::Sh4_Cpu()
     macl = UNDEFINED_REG_VAL;
     procedure_register = UNDEFINED_REG_VAL;
     pc = 0xA0000000;
+    delay_pc = pc + 2;
     fpscr = FPSCR_INITIAL_VALUE;
     fpul = UNDEFINED_REG_VAL;
 
@@ -161,6 +162,16 @@ void Sh4_Cpu::set_pc(std::uint32_t pc_)
 std::uint32_t Sh4_Cpu::get_pc()
 {
     return pc;
+}
+
+void Sh4_Cpu::set_delay_pc(std::uint32_t delay_pc_)
+{
+    delay_pc = delay_pc_;
+}
+
+std::uint32_t Sh4_Cpu::get_delay_pc()
+{
+    return delay_pc;
 }
 
 void Sh4_Cpu::set_expevt(std::uint32_t expevt_)
