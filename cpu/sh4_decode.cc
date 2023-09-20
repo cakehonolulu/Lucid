@@ -144,7 +144,13 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
                     cpu->set_register(nnnn, cpu->get_register(nnnn) << 8);
                     break;
-                    
+                
+                case 0b00100001:
+                    std::cout << BOLDWHITE << "shar r" << +(nnnn) << "\n";
+                    cpu->set_tbit(cpu->get_register(nnnn) & 0x00000001);
+                    cpu->set_register(nnnn, (((std::int32_t) cpu->get_register(nnnn)) >> 1));
+                    break;
+
                 case 0b00101000:
                     std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
                     cpu->set_register(nnnn, cpu->get_register(nnnn) << 16);
