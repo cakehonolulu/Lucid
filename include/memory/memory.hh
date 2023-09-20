@@ -186,6 +186,17 @@ public:
             std::cout << BOLDMAGENTA << "memory_write: Write to the MMUCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_mmucr(value);
         }
+        else if (p_addr == 0x1F00001C)
+        {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to CCR register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the CCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_ccr(value);
+        }
         else
         {
             std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", p_addr) << " with value 0x";

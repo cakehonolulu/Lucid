@@ -46,6 +46,8 @@ Sh4_Cpu::Sh4_Cpu()
 
     mmucr = 0x00000000;
 
+    ccr = 0x00000000;
+
     /*
         Map both banked registers and regular registers to a big register array.
 
@@ -214,4 +216,14 @@ void Sh4_Cpu::set_mmucr(std::uint32_t mmucr_)
 std::uint32_t Sh4_Cpu::get_mmucr()
 {
     return (mmucr);
+}
+
+void Sh4_Cpu::set_ccr(std::uint32_t ccr_)
+{
+    ccr = ccr_;
+}
+
+std::uint32_t Sh4_Cpu::get_ccr()
+{
+    return ccr;
 }

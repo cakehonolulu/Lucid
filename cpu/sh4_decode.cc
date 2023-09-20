@@ -198,6 +198,20 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         /*
             Opcode type:
 
+            0111nnnniiiiiiii
+        */
+        case 0b0111:
+        {
+            std::cout << "add #" << +((std::int32_t) imm) << ",r" << +(nnnn) << std::endl;
+
+            cpu->set_register(nnnn, cpu->get_register(nnnn) + ((std::int32_t) imm));
+
+            break;
+        }
+
+        /*
+            Opcode type:
+
             0b1000xxxxxxxxxxxx
         */
         case 0b1000:

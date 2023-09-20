@@ -187,6 +187,15 @@ private:
 	*/
 	std::uint32_t mmucr;
 
+	/*
+		Cache Control Registers
+	*/
+
+	/*
+		Cache control register
+	*/
+	std::uint32_t ccr;
+
 public:
 
 	Sh4_Cpu();
@@ -223,4 +232,7 @@ public:
 
 	void set_mmucr(std::uint32_t mmucr_);
 	std::uint32_t get_mmucr();
+
+	void set_ccr(std::uint32_t ccr_);
+	std::uint32_t get_ccr();
 };
