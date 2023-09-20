@@ -89,6 +89,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0010:
             switch (opcode & 0x000F)
             {
+                case 0b1000:
+                    std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    cpu->set_tbit(cpu->get_register(mmmm) & cpu->get_register(nnnn) ? 0 : 1);
+                    break;
+
                 case 0b1010:
                     std::cout << BOLDWHITE << "xor r" << +(mmmm) << ", r" << +(nnnn) << "\n";
                     cpu->set_register(nnnn, cpu->get_register(mmmm) ^ cpu->get_register(nnnn));

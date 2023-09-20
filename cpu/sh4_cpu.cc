@@ -182,3 +182,13 @@ std::uint32_t Sh4_Cpu::get_macl()
 {
     return macl;
 }
+
+void Sh4_Cpu::set_tbit(std::uint8_t tbit_)
+{
+    status_register = (status_register & 0xFFFFFFFE) | (tbit_ & 0x01);
+}
+
+std::uint8_t Sh4_Cpu::get_tbit()
+{
+    return (status_register & 0x01);
+}

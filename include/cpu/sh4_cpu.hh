@@ -202,4 +202,7 @@ public:
 	
 	void set_macl(std::uint32_t macl_);
 	std::uint32_t get_macl();
+
+	void set_tbit(std::uint8_t tbit_);
+	std::uint8_t get_tbit();
 };
