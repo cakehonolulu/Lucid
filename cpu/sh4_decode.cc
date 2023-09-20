@@ -39,7 +39,8 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
     std::int8_t imm = ((std::int8_t) (opcode & 0xFF));
     std::uint8_t nnnn = ((opcode & 0x0F00) >> 8);
     std::uint8_t mmmm = ((opcode & 0x00F0) >> 4);
-    std::uint8_t dddd = (std::uint8_t) (opcode & 0x000F >> 0);
+    std::uint8_t dddd = (std::uint8_t) ((opcode & 0x000F) >> 0);
+    std::uint16_t dddddddd = (std::uint16_t) ((opcode & 0x00FF) >> 0);
 
     switch (function) {
 
@@ -178,6 +179,30 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 
                 default:
                     std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0110 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    cpu->print_registers();
+                    exit(1);
+                    break;
+            }
+            break;
+
+        /*
+            Opcode type:
+
+            0b1000xxxxxxxxxxxx
+        */
+        case 0b1000:
+            switch ((opcode & 0x0F00) >> 8)
+            {
+                case 0b1011:
+                {
+                    std::uint32_t pc_ = (dddddddd * 2) + cpu->get_pc() + 4;
+                    std::cout << BOLDWHITE << "bf 0x" << format("{:08X}", pc_) << "\n";
+                    if (!cpu->get_tbit()) cpu->set_pc(pc_);
+                    break;
+                }
+
+                default:
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b1000 opcode variation 0x" << format("{:02X}", (opcode & 0x0F00) >> 8) << " (0b" << format("{:04b}", (opcode & 0x0F00) >> 8) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     cpu->print_registers();
                     exit(1);
                     break;
