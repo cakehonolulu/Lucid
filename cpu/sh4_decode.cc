@@ -254,6 +254,27 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         /*
             Opcode type:
 
+            0b1100xxxxdddddddd
+        */
+        case 0b1100:
+            switch ((opcode & 0x0F00) >> 8)
+            {
+                case 0b1011:
+                    std::cout << "or #" << +((std::uint8_t) imm) << ", r0" << std::endl;
+                    cpu->set_register(0, cpu->get_register(0) | ((std::uint8_t) imm));
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b1100 opcode variation 0x" << format("{:02X}", (opcode & 0x0F00) >> 8) << " (0b" << format("{:04b}", (opcode & 0x0F00) >> 8) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    cpu->print_registers();
+                    exit(1);
+                    break;
+            }
+            break;
+
+        /*
+            Opcode type:
+
             0b1110nnnniiiiiiii
         */
         case 0b1110:
