@@ -52,6 +52,29 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0000:
             switch (opcode & 0x000F)
             {
+                case 0b0011:
+                    switch((opcode & 0x00F0) >> 4)
+                    {
+                        case 0b1000:
+                            /*
+                                TODO:
+
+                                This deals with cached memory regions, maybe it's important later on?
+                            */
+                            std::cout << "pref @r" << +(nnnn) << std::endl;
+                            std::cout << BOLDYELLOW << "parse_opcode: pref instruction detected, cached address is 0x" << format("{:08X}", GET_REG(nnnn)) << RESET << std::endl;
+                            break;
+
+                        default:
+                            std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0000 opcode variation 0x" << format("{:02X}", (opcode & 0x000F))
+                                << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), subfamily 0b" << format("{:04b}", ((opcode & 0x00F0) >> 4))
+                                << RESET << "\n";
+                            cpu->print_registers();
+                            exit(1);
+                            break;
+                    }
+                    break;
+
                 case 0b1010:
                     /*
                         To find which STx family of instructions we're dealing with, check the bit pattern
@@ -277,6 +300,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b1100:
             switch ((opcode & 0x0F00) >> 8)
             {
+                case 0b1000:
+                    std::cout << "tst #" << +((std::uint8_t) imm) << ", r0" << std::endl;
+                    SET_TBIT((GET_REG(0) & imm) ? 0 : 1);
+                    break;
+
                 case 0b1011:
                     std::cout << "or #" << +((std::uint8_t) imm) << ", r0" << std::endl;
                     SET_REG(0, GET_REG(0) | ((std::uint8_t) imm));
