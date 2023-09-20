@@ -199,11 +199,12 @@ public:
         }
         else if (p_addr == 0x1F800004)
         {
-            if (!(std::is_same<T, uint32_t>::value))
+            // TODO?
+            /*if (!(std::is_same<T, uint32_t>::value))
             {
                 std::cout << BOLDRED "memory_write: Tried to write to BCR1 register with a size != LONGWORD ...!" << RESET << "\n";
                 exit(1);
-            }
+            }*/
 
             std::cout << BOLDMAGENTA << "memory_write: Write to the BCR1 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_bcr1(value);

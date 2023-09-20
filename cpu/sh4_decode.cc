@@ -141,6 +141,13 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     SET_REG(nnnn, (GET_REG(nnnn) >> 1));
                     break;
 
+                case 0b00000101:
+                    std::cout << BOLDWHITE << "rotr r" << +(nnnn) << "\n";
+                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
+                    SET_REG(nnnn, (GET_REG(nnnn) >> 1));
+                    SET_REG(nnnn, GET_REG(nnnn) | (GET_TBIT() << 31));
+                    break;
+
                 case 0b00001001:
                     std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(nnnn) >> 2);
@@ -194,7 +201,12 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0110:
             switch (opcode & 0x000F)
             {
-                case 0b00001001:
+                case 0b0011:
+                    std::cout << BOLDWHITE << "mov r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    SET_REG(nnnn, GET_REG(mmmm));
+                    break;
+
+                case 0b1001:
                     std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
                     SET_REG(nnnn, (GET_REG(mmmm) >> 16) | (GET_REG(mmmm) << 16));
                     break;
