@@ -196,6 +196,15 @@ private:
 	*/
 	std::uint32_t ccr;
 
+	/*
+		Bus State Control (BSC) Registers
+	*/
+
+	/*
+		Bus Control Register 1 (BCR1)
+	*/
+	std::uint32_t bcr1;
+
 public:
 
 	Sh4_Cpu();
@@ -235,4 +244,7 @@ public:
 
 	void set_ccr(std::uint32_t ccr_);
 	std::uint32_t get_ccr();
+
+	void set_bcr1(std::uint32_t bcr1_);
+	std::uint32_t get_bcr1();
 };

@@ -42,7 +42,7 @@ public:
 
         T *from;
 
-//#ifdef MEMORY_DEBUG
+#ifdef MEMORY_DEBUG
         std::cout << "memory_read: Reading from 0x" << format("{:08X}", address) << ", P: " << +(p) << " , ALT: " 
         << +(alt) << " , NC: " << +(nc) << std::endl;
 
@@ -70,14 +70,14 @@ public:
         {
             std::cout << "             P4 read (";
         }
-//#endif
+#endif
 
         // Calculate the physical address
         std::uint32_t p_addr = (address & 0x1FFFFFFF);
 
-//#ifdef MEMORY_DEBUG
+#ifdef MEMORY_DEBUG
         std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
-//#endif
+#endif
 
         // $00000000 - $001FFFFF | Boot ROM (2MB)
         if (p_addr >= 0x00000000 && p_addr <= 0x001FFFFF)
@@ -130,7 +130,7 @@ public:
         bool alt = (address >> 30) & 1;
         bool nc = (address >> 29) & 1;
 
-//#ifdef MEMORY_DEBUG
+#ifdef MEMORY_DEBUG
         std::cout << "memory_write: Writing to 0x" << format("{:08X}", address) << ", P: " << +(p) << " , ALT: " 
         << +(alt) << " , NC: " << +(nc) << std::endl;
 
@@ -158,14 +158,14 @@ public:
         {
             std::cout << "             P4 read (";
         }
-//#endif
+#endif
 
         // Calculate the physical address
         std::uint32_t p_addr = (address & 0x1FFFFFFF);
 
-//#ifdef MEMORY_DEBUG
+#ifdef MEMORY_DEBUG
         std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
-//#endif
+#endif
 
         if (p_addr >= 0x00000000 && p_addr <= 0x001FFFFF)
         {
@@ -196,6 +196,11 @@ public:
 
             std::cout << BOLDMAGENTA << "memory_write: Write to the CCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_ccr(value);
+        }
+        else if (p_addr == 0x1F800004)
+        {
+            std::cout << BOLDMAGENTA << "memory_write: Write to the BCR1 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_bcr1(value);
         }
         else
         {
