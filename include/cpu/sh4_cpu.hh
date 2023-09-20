@@ -178,6 +178,15 @@ private:
 	*/
 	std::uint32_t expevt;
 
+	/*
+		MMU Registers
+	*/
+
+	/*
+		MMU control register
+	*/
+	std::uint32_t mmucr;
+
 public:
 
 	Sh4_Cpu();
@@ -211,4 +220,7 @@ public:
 
 	void set_tbit(std::uint8_t tbit_);
 	std::uint8_t get_tbit();
+
+	void set_mmucr(std::uint32_t mmucr_);
+	std::uint32_t get_mmucr();
 };

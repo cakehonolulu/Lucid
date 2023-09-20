@@ -44,6 +44,8 @@ Sh4_Cpu::Sh4_Cpu()
 
     expevt = 0x00000000;
 
+    mmucr = 0x00000000;
+
     /*
         Map both banked registers and regular registers to a big register array.
 
@@ -202,4 +204,14 @@ void Sh4_Cpu::set_tbit(std::uint8_t tbit_)
 std::uint8_t Sh4_Cpu::get_tbit()
 {
     return (status_register & 0x01);
+}
+
+void Sh4_Cpu::set_mmucr(std::uint32_t mmucr_)
+{
+    mmucr = mmucr_;
+}
+
+std::uint32_t Sh4_Cpu::get_mmucr()
+{
+    return (mmucr);
 }
