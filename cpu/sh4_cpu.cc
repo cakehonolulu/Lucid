@@ -41,6 +41,8 @@ Sh4_Cpu::Sh4_Cpu()
     fpscr = FPSCR_INITIAL_VALUE;
     fpul = UNDEFINED_REG_VAL;
 
+    expevt = 0x00000000;
+
     /*
         Map both banked registers and regular registers to a big register array.
 
@@ -98,6 +100,9 @@ void Sh4_Cpu::print_registers()
     std::cout << "Program Counter (PC):                                        " << BOLDWHITE << "0x" << format("{:08X}", pc) << RESET << "\n";
     std::cout << "Floating-point Status/Control Register (FPSCR):              " << BOLDWHITE << "0x" << format("{:08X}", fpscr) << RESET << "\n";
     std::cout << "Floating-point Communication Register (FPUL):                " << BOLDWHITE << "0x" << format("{:08X}", fpul) << RESET << "\n";
+    
+    std::cout << "\n" << BOLDYELLOW << "Exception Registers:" << RESET "\n";
+    std::cout << "Exception event register (EXPEVT):                           " << BOLDWHITE << "0x" << format("{:08X}", expevt) << RESET << "\n";
 }
 
 void Sh4_Cpu::remap_banking_registers()
@@ -156,4 +161,14 @@ void Sh4_Cpu::set_pc(std::uint32_t pc_)
 std::uint32_t Sh4_Cpu::get_pc()
 {
     return pc;
+}
+
+void Sh4_Cpu::set_expevt(std::uint32_t expevt_)
+{
+    expevt = expevt_;
+}
+
+std::uint32_t Sh4_Cpu::get_expevt()
+{
+    return expevt;
 }

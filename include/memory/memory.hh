@@ -84,6 +84,18 @@ public:
         {
             from = reinterpret_cast<T*>(&flash[p_addr - 0x00200000]);
         }
+        else if (p_addr == 0x1F000024)
+        {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_read: Tried to read from EXPEVT register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_read: Read from the EXPEVT register" << RESET << std::endl;
+
+            return static_cast<uint32_t>(cpu->get_expevt());
+        }
         else
         {
             std::cout << BOLDRED "memory_read: Unhandled read at address 0x" << format("{:08X}", p_addr) << RESET << "\n";

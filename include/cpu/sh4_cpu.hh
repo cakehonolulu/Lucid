@@ -160,6 +160,21 @@ private:
 	*/
 	std::uint32_t fpul;
 
+	/*
+		Exception Registers
+	*/
+
+	/*
+		Exception event register
+
+		Initial Values:
+
+		0x00000000	(Power-on Reset)
+		or
+		0x00000020 (Manual Reset)
+	*/
+	std::uint32_t expevt;
+
 public:
 
 	Sh4_Cpu();
@@ -181,4 +196,7 @@ public:
 
 	void set_pc(std::uint32_t pc_);
 	std::uint32_t get_pc();
+	
+	void set_expevt(std::uint32_t expevt_);
+	std::uint32_t get_expevt();
 };
