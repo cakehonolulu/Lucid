@@ -172,3 +172,13 @@ std::uint32_t Sh4_Cpu::get_expevt()
 {
     return expevt;
 }
+
+void Sh4_Cpu::set_macl(std::uint32_t macl_)
+{
+    macl = macl_;
+}
+
+std::uint32_t Sh4_Cpu::get_macl()
+{
+    return macl;
+}

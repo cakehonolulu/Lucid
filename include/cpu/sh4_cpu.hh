@@ -199,4 +199,7 @@ public:
 	
 	void set_expevt(std::uint32_t expevt_);
 	std::uint32_t get_expevt();
+	
+	void set_macl(std::uint32_t macl_);
+	std::uint32_t get_macl();
 };

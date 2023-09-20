@@ -56,6 +56,14 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     cpu->set_register(nnnn, cpu->get_register(mmmm) ^ cpu->get_register(nnnn));
                     break;
 
+                case 0b1110:
+                {
+                    std::cout << BOLDWHITE << "mulu.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    std::uint32_t macl_ = (std::uint32_t) ((cpu->get_register(mmmm) & 0xFFFF) * (cpu->get_register(nnnn) & 0xFFFF));
+                    cpu->set_macl(macl_);
+                    break;
+                }
+
                 default:
                     std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0010 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     cpu->print_registers();
