@@ -102,7 +102,7 @@ public:
         }
         else
         {
-            std::cout << BOLDRED "memory_read: Unhandled read at address 0x" << format("{:08X}", p_addr) << RESET << "\n";
+            std::cout << BOLDRED "memory_read: Unhandled read at address 0x" << format("{:08X}", p_addr) << " (Virtual: 0x" << format("{:08X}", address) << ")" << RESET << "\n";
             exit(1);
         }
 
@@ -199,12 +199,29 @@ public:
         }
         else if (p_addr == 0x1F800004)
         {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to BCR1 register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
             std::cout << BOLDMAGENTA << "memory_write: Write to the BCR1 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_bcr1(value);
         }
+        else if (p_addr == 0x1F80000C)
+        {
+            if (!(std::is_same<T, uint32_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to WCR2 register with a size != LONGWORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the WCR2 register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_wcr2(value);
+        }
         else
         {
-            std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", p_addr) << " with value 0x";
+            std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", p_addr) << " (Virtual: 0x" << format("{:08X}", address) << ") with value 0x";
             
             if (std::is_same<T, uint8_t>::value)
             {

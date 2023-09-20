@@ -26,7 +26,7 @@ void Sh4_Decode::run()
 
 uint16_t Sh4_Decode::fetch_opcode()
 {
-    uint16_t opcode = memory->read<uint16_t>(cpu->get_pc(), cpu);
+    uint16_t opcode = memory->read<uint16_t>(GET_PC(), cpu);
     return opcode;
 }
 
@@ -61,7 +61,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     {
                         case 0b0001:
                             std::cout << BOLDWHITE << "sts macl, r" << +(nnnn) << "\n";
-                            cpu->set_register(nnnn, cpu->get_macl());
+                            SET_REG(nnnn, cpu->get_macl());
                             break;
 
                         default:
@@ -89,7 +89,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         */
         case 0b0001:
             std::cout << "mov.l r" << +(mmmm) << ",@(" << +(dddd << 2) << ",r" << +(nnnn) << ")" << std::endl;
-            memory->write<uint32_t>(((dddd << 2) + cpu->get_register(nnnn)), cpu->get_register(mmmm), cpu);
+            memory->write<uint32_t>(((dddd << 2) + GET_REG(nnnn)), GET_REG(mmmm), cpu);
             break;
 
         /*
@@ -102,18 +102,18 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             {
                 case 0b1000:
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
-                    cpu->set_tbit(cpu->get_register(mmmm) & cpu->get_register(nnnn) ? 0 : 1);
+                    SET_TBIT(GET_REG(mmmm) & GET_REG(nnnn) ? 0 : 1);
                     break;
 
                 case 0b1010:
                     std::cout << BOLDWHITE << "xor r" << +(mmmm) << ", r" << +(nnnn) << "\n";
-                    cpu->set_register(nnnn, cpu->get_register(mmmm) ^ cpu->get_register(nnnn));
+                    SET_REG(nnnn, GET_REG(mmmm) ^ GET_REG(nnnn));
                     break;
 
                 case 0b1110:
                 {
                     std::cout << BOLDWHITE << "mulu.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
-                    std::uint32_t macl_ = (std::uint32_t) ((cpu->get_register(mmmm) & 0xFFFF) * (cpu->get_register(nnnn) & 0xFFFF));
+                    std::uint32_t macl_ = (std::uint32_t) ((GET_REG(mmmm) & 0xFFFF) * (GET_REG(nnnn) & 0xFFFF));
                     cpu->set_macl(macl_);
                     break;
                 }
@@ -135,25 +135,31 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0100:
             switch (opcode & 0x00FF)
             {
+                case 0b00000001:
+                    std::cout << BOLDWHITE << "shlr r" << +(nnnn) << "\n";
+                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
+                    SET_REG(nnnn, (GET_REG(nnnn) >> 1));
+                    break;
+
                 case 0b00001001:
                     std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
-                    cpu->set_register(nnnn, cpu->get_register(nnnn) >> 2);
+                    SET_REG(nnnn, GET_REG(nnnn) >> 2);
                     break;
 
                 case 0b00011000:
                     std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
-                    cpu->set_register(nnnn, cpu->get_register(nnnn) << 8);
+                    SET_REG(nnnn, GET_REG(nnnn) << 8);
                     break;
                 
                 case 0b00100001:
                     std::cout << BOLDWHITE << "shar r" << +(nnnn) << "\n";
-                    cpu->set_tbit(cpu->get_register(nnnn) & 0x00000001);
-                    cpu->set_register(nnnn, (((std::int32_t) cpu->get_register(nnnn)) >> 1));
+                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
+                    SET_REG(nnnn, (((std::int32_t) GET_REG(nnnn)) >> 1));
                     break;
 
                 case 0b00101000:
                     std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
-                    cpu->set_register(nnnn, cpu->get_register(nnnn) << 16);
+                    SET_REG(nnnn, GET_REG(nnnn) << 16);
                     break;
 
                 default:
@@ -173,9 +179,9 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         {
             std::cout << "mov.l @(" << +(dddd << 2) << ",r" << +(mmmm) << "),r" << +(nnnn) << std::endl;
 
-            std::uint32_t value = memory->read<uint32_t>((cpu->get_register(mmmm) + (dddd << 2)), cpu);
+            std::uint32_t value = memory->read<uint32_t>((GET_REG(mmmm) + (dddd << 2)), cpu);
 
-            cpu->set_register(nnnn, value);
+            SET_REG(nnnn, value);
             break;
         }
 
@@ -190,7 +196,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             {
                 case 0b00001001:
                     std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
-                    cpu->set_register(nnnn, (cpu->get_register(mmmm) >> 16) | (cpu->get_register(mmmm) << 16));
+                    SET_REG(nnnn, (GET_REG(mmmm) >> 16) | (GET_REG(mmmm) << 16));
                     break;
 
                 default:
@@ -210,7 +216,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         {
             std::cout << "add #" << +((std::int32_t) imm) << ",r" << +(nnnn) << std::endl;
 
-            cpu->set_register(nnnn, cpu->get_register(nnnn) + ((std::int32_t) imm));
+            SET_REG(nnnn, GET_REG(nnnn) + ((std::int32_t) imm));
 
             break;
         }
@@ -225,18 +231,18 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             {
                 case 0b0001:
                     std::cout << "mov.w r0,@(" << +(dddd << 1) << ",r" << +(mmmm) << ")" << std::endl;
-                    memory->write((cpu->get_register(mmmm) + (dddd << 1)), (std::uint16_t) (cpu->get_register(0) & 0xFFFF), cpu);
+                    memory->write((GET_REG(mmmm) + (dddd << 1)), (std::uint16_t) (GET_REG(0) & 0xFFFF), cpu);
                     break;
 
                 case 0b1011:
                 {
-                    std::uint32_t pc_ = (dddddddd * 2) + cpu->get_pc() + 4;
+                    std::uint32_t pc_ = (dddddddd * 2) + GET_PC() + 4;
                     std::cout << BOLDWHITE << "bf 0x" << format("{:08X}", pc_) << "\n";
 
-                    if (!cpu->get_tbit())
+                    if (!GET_TBIT())
                     {
-                        cpu->set_pc(pc_);
-                        cpu->set_delay_pc(cpu->get_pc() + 2);
+                        SET_PC(pc_);
+                        SET_DELAY_PC(GET_PC() + 2);
 
                         skip_pc_set = true;
                     }
@@ -261,7 +267,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             {
                 case 0b1011:
                     std::cout << "or #" << +((std::uint8_t) imm) << ", r0" << std::endl;
-                    cpu->set_register(0, cpu->get_register(0) | ((std::uint8_t) imm));
+                    SET_REG(0, GET_REG(0) | ((std::uint8_t) imm));
                     break;
 
                 default:
@@ -279,7 +285,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         */
         case 0b1110:
             std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(nnnn) << "\n";
-            cpu->set_register(nnnn, (std::int32_t) imm);
+            SET_REG(nnnn, (std::int32_t) imm);
             break;
 
         default:
@@ -291,7 +297,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
     
     if (!skip_pc_set)
     {
-        cpu->set_pc(cpu->get_delay_pc());
-        cpu->set_delay_pc(cpu->get_delay_pc() + 2);
+        SET_PC(GET_DELAY_PC());
+        SET_DELAY_PC(GET_DELAY_PC() + 2);
     }
 }

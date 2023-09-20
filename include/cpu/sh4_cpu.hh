@@ -205,6 +205,11 @@ private:
 	*/
 	std::uint32_t bcr1;
 
+	/*
+		Wait-State Control Register 2 (WCR2)
+	*/
+	std::uint32_t wcr2;
+
 public:
 
 	Sh4_Cpu();
@@ -247,4 +252,7 @@ public:
 
 	void set_bcr1(std::uint32_t bcr1_);
 	std::uint32_t get_bcr1();
+
+	void set_wcr2(std::uint32_t wcr2_);
+	std::uint32_t get_wcr2();
 };

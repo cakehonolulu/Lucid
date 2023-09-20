@@ -50,6 +50,8 @@ Sh4_Cpu::Sh4_Cpu()
 
     bcr1 = 0x00000000;
 
+    wcr2 = 0xFFFEEFFF;
+
     /*
         Map both banked registers and regular registers to a big register array.
 
@@ -238,4 +240,14 @@ void Sh4_Cpu::set_bcr1(std::uint32_t bcr1_)
 std::uint32_t Sh4_Cpu::get_bcr1()
 {
     return bcr1;
+}
+
+void Sh4_Cpu::set_wcr2(std::uint32_t wcr2_)
+{
+    wcr2 = wcr2_;
+}
+
+std::uint32_t Sh4_Cpu::get_wcr2()
+{
+    return wcr2;
 }
