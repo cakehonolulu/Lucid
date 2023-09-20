@@ -43,6 +43,28 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 
     switch (function) {
 
+         /*
+            Opcode type:
+
+            0010nnnnmmmmxxxx
+        */
+        case 0b0010:
+            switch (opcode & 0x000F)
+            {
+                case 0b1010:
+                    std::cout << BOLDWHITE << "xor r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    cpu->set_register(nnnn, cpu->get_register(mmmm) ^ cpu->get_register(nnnn));
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0010 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    cpu->print_registers();
+                    exit(1);
+                    break;
+            }
+
+            break;
+
         /*
             Opcode type:
 
@@ -67,7 +89,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     break;
 
                 default:
-                    std::cerr << BOLDRED << "Unimplemented 0b0100 opcode variation : 0x" << format("{:02X}", (opcode & 0x00FF)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0100 opcode variation 0x" << format("{:04X}", (opcode & 0x00FF)) << " (0b" << format("{:08b}", (opcode & 0x00FF)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     cpu->print_registers();
                     exit(1);
                     break;
@@ -104,7 +126,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     break;
 
                 default:
-                    std::cerr << BOLDRED << "Unimplemented 0b0110 opcode variation : 0x" << format("{:02X}", (opcode & 0x000F)) << ", complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0110 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     cpu->print_registers();
                     exit(1);
                     break;
