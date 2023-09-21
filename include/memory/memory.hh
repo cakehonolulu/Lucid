@@ -175,6 +175,11 @@ public:
         {
             flash[p_addr - 0x00200000] = value;
         }
+        else if (p_addr == 0x005F7480)
+        {
+            std::cout << BOLDMAGENTA << "memory_write: Write to the SB_G1RRC register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_sb_g1rrc(value);
+        }
         else if (p_addr == 0x1F000010)
         {
             if (!(std::is_same<T, uint32_t>::value))

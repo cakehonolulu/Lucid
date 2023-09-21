@@ -142,6 +142,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     std::cout << BOLDWHITE << "mov.b r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
                     memory->write(GET_REG(nnnn), (std::uint8_t) GET_REG(mmmm), cpu);
                     break;
+                
+                case 0b0001:
+                    std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
+                    memory->write(GET_REG(nnnn), (std::uint16_t) GET_REG(mmmm), cpu);
+                    break;
 
                 case 0b1000:
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
@@ -168,6 +173,27 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     break;
             }
 
+            break;
+
+        /*
+            Opcode type:
+
+            0b0011nnnnmmmmxxxx
+        */
+        case 0b0011:
+            switch (opcode & 0x000F)
+            {
+                case 0b0110:
+                    std::cout << "cmp/hi r" << +(mmmm) << ",r" << +(nnnn) << std::endl;
+                    SET_TBIT(GET_REG(nnnn) > GET_REG(mmmm) ? 1 : 0);
+                    break;
+
+                default:
+                    std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0011 opcode variation 0x" << format("{:02X}", (opcode & 0x000F)) << " (0b" << format("{:04b}", (opcode & 0x000F)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
+                    cpu->print_registers();
+                    exit(1);
+                    break;
+            }
             break;
 
         /*
@@ -242,22 +268,27 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             break;
         }
 
-
         /*
             Opcode type:
 
-            0b0100nnnnmmmmxxxx
+            0b0110nnnnmmmmxxxx
         */
         case 0b0110:
             switch (opcode & 0x000F)
             {
                 case 0b0011:
-                    std::cout << BOLDWHITE << "mov r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    std::cout << BOLDWHITE << "mov r" << +(mmmm) << ",r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(mmmm));
                     break;
 
+                case 0b1000:
+                    std::cout << BOLDWHITE << "swap.b r" << +(mmmm) << ",r" << +(nnnn) << std::endl;
+                    SET_REG(nnnn, (GET_REG(mmmm) & 0xFFFF0000) | ((GET_REG(mmmm) & 0x0000FF00) >> 8)
+                                    |((GET_REG(mmmm) & 0x000000FF) << 8));
+                    break;
+
                 case 0b1001:
-                    std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
+                    std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ",r" << +(nnnn) << "\n";
                     SET_REG(nnnn, (GET_REG(mmmm) >> 16) | (GET_REG(mmmm) << 16));
                     break;
 

@@ -245,6 +245,15 @@ private:
 	*/
 	std::uint16_t rtcsr;
 
+	/*
+		G1 Interface Block Hardware Control Registers
+	*/
+
+	/*
+		SB_G1RRC (Write Only)
+	*/
+	std::uint32_t sb_g1rrc;
+
 public:
 
 	Sh4_Cpu();
@@ -311,4 +320,7 @@ public:
 
 	void set_rtcsr(std::uint16_t rtcsr_);
 	std::uint16_t get_rtcsr();
+
+	void set_sb_g1rrc(std::uint32_t sb_g1rrc_);
+	std::uint32_t get_sb_g1rrc();	
 };

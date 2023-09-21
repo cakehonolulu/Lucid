@@ -330,3 +330,13 @@ std::uint16_t Sh4_Cpu::get_rtcsr()
 {
     return rtcsr;
 }
+
+void Sh4_Cpu::set_sb_g1rrc(std::uint32_t sb_g1rrc_)
+{
+    sb_g1rrc = sb_g1rrc_;
+}
+
+std::uint32_t Sh4_Cpu::get_sb_g1rrc()
+{
+    return sb_g1rrc;
+}
