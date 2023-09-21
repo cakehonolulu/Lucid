@@ -138,6 +138,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0010:
             switch (opcode & 0x000F)
             {
+                case 0b0000:
+                    std::cout << BOLDWHITE << "mov.b r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
+                    memory->write(GET_REG(nnnn), (std::uint8_t) GET_REG(mmmm), cpu);
+                    break;
+
                 case 0b1000:
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
                     SET_TBIT(GET_REG(mmmm) & GET_REG(nnnn) ? 0 : 1);

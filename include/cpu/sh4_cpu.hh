@@ -225,6 +225,16 @@ private:
 	*/
 	std::uint32_t mcr;
 
+	/*
+		SDRAM Mode Register (SDMR)
+	*/
+	std::uint16_t sdmr;
+
+	/*
+		Refresh Count Register (RFCR)
+	*/
+	std::uint16_t rfcr;
+	
 public:
 
 	Sh4_Cpu();
@@ -279,4 +289,10 @@ public:
 
 	void set_mcr(std::uint32_t mcr_);
 	std::uint32_t get_mcr();
+	
+	void set_sdmr(std::uint16_t sdmr_);
+	std::uint16_t get_sdmr();
+	
+	void set_rfcr(std::uint16_t rfcr_);
+	std::uint16_t get_rfcr();
 };

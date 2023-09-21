@@ -252,6 +252,16 @@ public:
             std::cout << BOLDMAGENTA << "memory_write: Write to the MCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_mcr(value);
         }
+        else if (p_addr == 0x1F800028)
+        {
+            std::cout << BOLDMAGENTA << "memory_write: Write to the SDMR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_sdmr(value);
+        }
+        else if (p_addr == 0x1F940190)
+        {
+            std::cout << BOLDMAGENTA << "memory_write: Write to the RFCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_rfcr(value);
+        }
         else
         {
             std::cout << BOLDRED << "memory_write: Unhandled write at address 0x" << format("{:08X}", p_addr) << " (Virtual: 0x" << format("{:08X}", address) << ") with value 0x";
