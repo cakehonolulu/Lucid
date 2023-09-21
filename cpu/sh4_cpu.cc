@@ -56,6 +56,9 @@ Sh4_Cpu::Sh4_Cpu()
 
     mcr = 0x00000000;
 
+    rtcor = 0x0000;
+    rfcr = 0x0000;
+
     sdmr = 0x00000000;
 
     /*
@@ -306,4 +309,24 @@ void Sh4_Cpu::set_rfcr(std::uint16_t rfcr_)
 std::uint16_t Sh4_Cpu::get_rfcr()
 {
     return rfcr;
+}
+
+void Sh4_Cpu::set_rtcor(std::uint16_t rtcor_)
+{
+    rtcor = rtcor_;
+}
+
+std::uint16_t Sh4_Cpu::get_rtcor()
+{
+    return rtcor;
+}
+
+void Sh4_Cpu::set_rtcsr(std::uint16_t rtcsr_)
+{
+    rtcsr = rtcsr_;
+}
+
+std::uint16_t Sh4_Cpu::get_rtcsr()
+{
+    return rtcsr;
 }

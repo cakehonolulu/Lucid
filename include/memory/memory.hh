@@ -252,6 +252,28 @@ public:
             std::cout << BOLDMAGENTA << "memory_write: Write to the MCR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
             cpu->set_mcr(value);
         }
+        else if (p_addr == 0x1F80001C)
+        {
+            if (!(std::is_same<T, uint16_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to RTCSR register with a size != WORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the RTCSR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_rtcsr(value);
+        }
+        else if (p_addr == 0x1F800024)
+        {
+            if (!(std::is_same<T, uint16_t>::value))
+            {
+                std::cout << BOLDRED "memory_write: Tried to write to RTCOR register with a size != WORD ...!" << RESET << "\n";
+                exit(1);
+            }
+
+            std::cout << BOLDMAGENTA << "memory_write: Write to the RTCOR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_rtcor(value);
+        }
         else if (p_addr == 0x1F800028)
         {
             std::cout << BOLDMAGENTA << "memory_write: Write to the SDMR register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;

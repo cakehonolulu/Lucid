@@ -296,6 +296,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     memory->write((GET_REG(mmmm) + (dddd << 1)), (std::uint16_t) (GET_REG(0) & 0xFFFF), cpu);
                     break;
 
+                case 0b0101:
+                    std::cout << "mov.w @(" << +(dddd << 1) << ",r" << +(mmmm) << "),r0" << std::endl;
+                    SET_REG(0, ((dddd << 1) + GET_REG(mmmm)));
+                    break;
+
                 case 0b1011:
                 {
                     std::uint32_t pc_ = (dddddddd * 2) + GET_PC() + 4;

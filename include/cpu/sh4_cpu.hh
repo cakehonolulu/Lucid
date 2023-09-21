@@ -234,7 +234,17 @@ private:
 		Refresh Count Register (RFCR)
 	*/
 	std::uint16_t rfcr;
+
+	/*
+		Refresh time constant counter (RTCOR)
+	*/
+	std::uint16_t rtcor;
 	
+	/*
+		Refresh timer control/status register (RTCSR)
+	*/
+	std::uint16_t rtcsr;
+
 public:
 
 	Sh4_Cpu();
@@ -295,4 +305,10 @@ public:
 	
 	void set_rfcr(std::uint16_t rfcr_);
 	std::uint16_t get_rfcr();
+
+	void set_rtcor(std::uint16_t rtcor_);
+	std::uint16_t get_rtcor();
+
+	void set_rtcsr(std::uint16_t rtcsr_);
+	std::uint16_t get_rtcsr();
 };
