@@ -21,6 +21,8 @@ void Sh4_Decode::run()
         uint16_t opcode = fetch_opcode();
 
         parse_opcode(opcode);
+
+        //cpu->print_registers();
     }
 }
 
@@ -74,7 +76,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                             break;
                     }
                     break;
-
+                            
                 case 0b1001:
                     if (opcode == 0x0009)
                     {
@@ -147,6 +149,12 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
                     memory->write(GET_REG(nnnn), (std::uint16_t) GET_REG(mmmm), cpu);
                     break;
+                
+                case 0b0101:
+                    std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@-r" << +(nnnn) << RESET << "\n";
+                    SET_REG(nnnn, GET_REG(nnnn) - 2);
+                    memory->write(GET_REG(nnnn), GET_REG(mmmm), cpu);
+                    break;
 
                 case 0b1000:
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
@@ -216,17 +224,23 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     SET_REG(nnnn, (GET_REG(nnnn) >> 1));
                     SET_REG(nnnn, GET_REG(nnnn) | (GET_TBIT() << 31));
                     break;
-
+                
                 case 0b00001001:
                     std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(nnnn) >> 2);
+                    break;
+                
+                case 0b00010000:
+                    std::cout << BOLDWHITE << "dt r" << +(nnnn) << std::endl;
+                    SET_REG(nnnn, GET_REG(nnnn) - 1);
+                    SET_TBIT(GET_REG(nnnn) == 0 ? 1 : 0);
                     break;
 
                 case 0b00011000:
                     std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(nnnn) << 8);
                     break;
-                
+                    
                 case 0b00100001:
                     std::cout << BOLDWHITE << "shar r" << +(nnnn) << "\n";
                     SET_TBIT(GET_REG(nnnn) & 0x00000001);
@@ -256,13 +270,21 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         /*
             Opcode type:
 
-            0101nnnnmmmmdddd
+            0b0101nnnnmmmmdddd
         */
         case 0b0101:
         {
             std::cout << "mov.l @(" << +(dddd << 2) << ",r" << +(mmmm) << "),r" << +(nnnn) << std::endl;
 
+            //RN(ir) = MEM_READ_LONG( RM(ir) + (DISP4(ir)<<2) );
+            
+            std::uint32_t addr =  (GET_REG(mmmm) + (dddd << 2));
+
+            std::cout << "Reading from 0x" << format("{:08X}", addr) << ", phys: " << format("{:08X}", addr & 0x1FFFFFFF) << std::endl;
+
             std::uint32_t value = memory->read<uint32_t>((GET_REG(mmmm) + (dddd << 2)), cpu);
+
+            std::cout << "Value read is 0x" << format("{:08X}", value) << std::endl;
 
             SET_REG(nnnn, value);
             break;
@@ -276,9 +298,20 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b0110:
             switch (opcode & 0x000F)
             {
+                case 0b0010:
+                    std::cout << BOLDWHITE << "mov.l @r" << +(mmmm) << ",r" << +(nnnn) << "\n";
+                    SET_REG(nnnn, memory->read<uint32_t>(GET_REG(mmmm), cpu));
+                    break;
+
                 case 0b0011:
                     std::cout << BOLDWHITE << "mov r" << +(mmmm) << ",r" << +(nnnn) << "\n";
                     SET_REG(nnnn, GET_REG(mmmm));
+                    break;
+
+                case 0b0101:
+                    std::cout << BOLDWHITE << "mov.w @r" << +(mmmm) << "+,r" << +(nnnn) << std::endl;
+                    SET_REG(nnnn, memory->read<uint16_t>(GET_REG(mmmm), cpu));
+                    SET_REG(mmmm, GET_REG(mmmm) + 2);
                     break;
 
                 case 0b1000:
@@ -334,12 +367,12 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 
                 case 0b1011:
                 {
-                    std::uint32_t pc_ = (dddddddd * 2) + GET_PC() + 4;
-                    std::cout << BOLDWHITE << "bf 0x" << format("{:08X}", pc_) << "\n";
+                    std::uint32_t pc_ = ((((std::int32_t)((std::int8_t)(opcode & 0x00FF))) << 1) + 4);
+                    std::cout << BOLDWHITE << "bf 0x" << format("{:08X}", GET_PC() + pc_) << "\n";
 
                     if (!GET_TBIT())
                     {
-                        SET_PC(pc_);
+                        SET_PC(GET_PC() + pc_);
                         SET_DELAY_PC(GET_PC() + 2);
 
                         skip_pc_set = true;
@@ -363,6 +396,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         case 0b1100:
             switch ((opcode & 0x0F00) >> 8)
             {
+                case 0b0111:
+                    std::cout << "mova @(" << +(dddd) << ",pc),r0" << std::endl;
+                    SET_REG(0, (GET_PC() & 0xFFFFFFFC) + (dddddddd << 2) + 4);
+                    break;
+
                 case 0b1000:
                     std::cout << "tst #" << +((std::uint8_t) imm) << ", r0" << std::endl;
                     SET_TBIT((GET_REG(0) & imm) ? 0 : 1);

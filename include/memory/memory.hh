@@ -88,6 +88,15 @@ public:
         {
             from = reinterpret_cast<T*>(&flash[p_addr - 0x00200000]);
         }
+        else if (p_addr == 0x005F7480)
+        {
+            std::cout << BOLDRED << "memory_read: Illegal read from the SB_G1RRC register (Write only register)!" << RESET << std::endl;
+            return 0;
+        }
+        else if (p_addr >= 0x0C000000 && p_addr <= 0x0FFFFFFF)
+        {
+            from = reinterpret_cast<T*>(&main_memory[p_addr - 0x0C000000]);
+        }
         else if (p_addr == 0x1F000024)
         {
             if (!(std::is_same<T, uint32_t>::value))
@@ -174,6 +183,10 @@ public:
         else if (p_addr >= 0x00200000 && p_addr <= 0x0023FFFF)
         {
             flash[p_addr - 0x00200000] = value;
+        }
+        else if (p_addr >= 0x0C000000 && p_addr <= 0x0FFFFFFF)
+        {
+            main_memory[p_addr - 0x0C000000] = value;
         }
         else if (p_addr == 0x005F7480)
         {

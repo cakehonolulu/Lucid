@@ -2,6 +2,7 @@
 #include <lucid.hh>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #if __has_include(<format>)
     #include <format>
@@ -16,6 +17,7 @@ Memory :: Memory()
     bios = new std::uint8_t[2 * 1024 * 1024];			// 2MB
     flash = new std::uint8_t[256 * 1024];				// 256KB
 	main_memory = new std::uint8_t[16 * 1024 * 1024];	// 16MB
+	memset(main_memory, 0, sizeof(uint8_t) * 16 * 1024 * 1024);
 	vram = new std::uint8_t[8 * 1024 * 1024];			// 8MB
 }
 
