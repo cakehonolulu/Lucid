@@ -176,17 +176,24 @@ public:
         std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
 #endif
 
-        if (p_addr >= 0x00000000 && p_addr <= 0x001FFFFF)
+        if (p_addr >= 0x0C000000 && p_addr <= 0x0FFFFFFF)
         {
-            bios[p_addr] = value;
-        }
-        else if (p_addr >= 0x00200000 && p_addr <= 0x0023FFFF)
-        {
-            flash[p_addr - 0x00200000] = value;
-        }
-        else if (p_addr >= 0x0C000000 && p_addr <= 0x0FFFFFFF)
-        {
-            main_memory[p_addr - 0x0C000000] = value;
+            if ((std::is_same<T, std::uint16_t>::value))
+            {
+                main_memory[p_addr - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
+                main_memory[(p_addr + 1) - 0x0C000000] = value & 0x00FF;
+            }
+            else
+            {
+                std::cout << BOLDRED << "memory_write: Write to SDRAM (16MB) region with unimplemented ";
+
+                if ((std::is_same<T, std::uint8_t>::value)) std::cout << "byte";
+                if ((std::is_same<T, std::uint32_t>::value)) std::cout << "longword";
+
+                std::cout << " size! Exiting..." << std::endl;
+                
+                exit(1);
+            }           
         }
         else if (p_addr == 0x005F7480)
         {

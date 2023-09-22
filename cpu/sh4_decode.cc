@@ -76,7 +76,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                             break;
                     }
                     break;
-                            
+        
                 case 0b1001:
                     if (opcode == 0x0009)
                     {
@@ -151,10 +151,14 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     break;
                 
                 case 0b0101:
+                {
                     std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@-r" << +(nnnn) << RESET << "\n";
                     SET_REG(nnnn, GET_REG(nnnn) - 2);
-                    memory->write(GET_REG(nnnn), GET_REG(mmmm), cpu);
+                    std::uint32_t dst = GET_REG(nnnn);
+                    std::uint16_t src = GET_REG(mmmm);
+                    memory->write(dst, src, cpu);
                     break;
+                }
 
                 case 0b1000:
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
@@ -276,17 +280,12 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
         {
             std::cout << "mov.l @(" << +(dddd << 2) << ",r" << +(mmmm) << "),r" << +(nnnn) << std::endl;
 
-            //RN(ir) = MEM_READ_LONG( RM(ir) + (DISP4(ir)<<2) );
-            
             std::uint32_t addr =  (GET_REG(mmmm) + (dddd << 2));
-
-            std::cout << "Reading from 0x" << format("{:08X}", addr) << ", phys: " << format("{:08X}", addr & 0x1FFFFFFF) << std::endl;
 
             std::uint32_t value = memory->read<uint32_t>((GET_REG(mmmm) + (dddd << 2)), cpu);
 
-            std::cout << "Value read is 0x" << format("{:08X}", value) << std::endl;
-
             SET_REG(nnnn, value);
+
             break;
         }
 
