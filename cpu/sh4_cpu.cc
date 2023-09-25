@@ -340,3 +340,13 @@ std::uint32_t Sh4_Cpu::get_sb_g1rrc()
 {
     return sb_g1rrc;
 }
+
+void Sh4_Cpu::set_holly_status(std::uint32_t holly_status_)
+{
+    holly_status = holly_status_;
+}
+
+std::uint32_t Sh4_Cpu::get_holly_status()
+{
+    return holly_status;
+}

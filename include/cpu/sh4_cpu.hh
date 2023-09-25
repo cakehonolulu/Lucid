@@ -254,6 +254,15 @@ private:
 	*/
 	std::uint32_t sb_g1rrc;
 
+	/*
+		Hidden Registers
+	*/
+
+	/*
+		Holly (?) Undocumented Status
+	*/
+	std::uint32_t holly_status;
+
 public:
 
 	Sh4_Cpu();
@@ -323,4 +332,7 @@ public:
 
 	void set_sb_g1rrc(std::uint32_t sb_g1rrc_);
 	std::uint32_t get_sb_g1rrc();	
+
+	void set_holly_status(std::uint32_t holly_status_);
+	std::uint32_t get_holly_status();	
 };

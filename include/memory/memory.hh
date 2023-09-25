@@ -176,6 +176,12 @@ public:
         std::cout << "Physical: 0x" << format("{:08X}", p_addr) << ")" << std::endl;
 #endif
 
+        if (p_addr == 0x005F74E4)
+        {
+            std::cout << BOLDMAGENTA << "memory_write: Write to undocumented Holly register (Value: 0x" << format("{:08X}", value) << ")" << RESET << std::endl;
+            cpu->set_holly_status(value);
+        }
+        else
         if (p_addr >= 0x0C000000 && p_addr <= 0x0FFFFFFF)
         {
             if ((std::is_same<T, std::uint16_t>::value))
@@ -183,12 +189,18 @@ public:
                 main_memory[p_addr - 0x0C000000] = value & 0x00FF;
                 main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
             }
+            else if ((std::is_same<T, std::uint32_t>::value))
+            {
+                main_memory[p_addr - 0x0C000000] = value & 0x00FF;
+                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
+                main_memory[(p_addr + 2) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF0000) >> 12);
+                main_memory[(p_addr + 3) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF000000) >> 16);
+            }
             else
             {
                 std::cout << BOLDRED << "memory_write: Write to SDRAM (16MB) region with unimplemented ";
 
                 if ((std::is_same<T, std::uint8_t>::value)) std::cout << "byte";
-                if ((std::is_same<T, std::uint32_t>::value)) std::cout << "longword";
 
                 std::cout << " size! Exiting..." << std::endl;
                 
