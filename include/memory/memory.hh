@@ -180,8 +180,8 @@ public:
         {
             if ((std::is_same<T, std::uint16_t>::value))
             {
-                main_memory[p_addr - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
-                main_memory[(p_addr + 1) - 0x0C000000] = value & 0x00FF;
+                main_memory[p_addr - 0x0C000000] = value & 0x00FF;
+                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
             }
             else
             {
