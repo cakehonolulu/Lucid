@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <fstream>
 
 #if __has_include(<format>)
     #include <format>
@@ -80,4 +81,13 @@ void Memory :: load_flash(const std::string& flash_path)
 	}
 
 	flash_file.close();
+}
+
+void Memory :: dump_ram()
+{
+	std::ofstream ram_file("ram.bin", std::ios::out | std::ios::binary);
+
+	ram_file.write(reinterpret_cast<const char*>(main_memory), sizeof(uint8_t) * 16 * 1024 * 1024);
+
+    ram_file.close();
 }

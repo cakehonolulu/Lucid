@@ -29,6 +29,8 @@ public:
 
     void load_bios(const std::string& bios_path);
     void load_flash(const std::string& flash_path);
+
+    void dump_ram();
     
     template <typename T>
     T read(uint32_t address, Sh4_Cpu *cpu) {
@@ -187,14 +189,14 @@ public:
             if ((std::is_same<T, std::uint16_t>::value))
             {
                 main_memory[p_addr - 0x0C000000] = value & 0x00FF;
-                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
+                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) >> 8) & 0xFF);
             }
             else if ((std::is_same<T, std::uint32_t>::value))
             {
-                main_memory[p_addr - 0x0C000000] = value & 0x00FF;
-                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF00) >> 8);
-                main_memory[(p_addr + 2) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF0000) >> 12);
-                main_memory[(p_addr + 3) - 0x0C000000] = ((((std::uint16_t) (value)) & 0xFF000000) >> 16);
+                main_memory[p_addr - 0x0C000000] = value & 0xFF;
+                main_memory[(p_addr + 1) - 0x0C000000] = ((((std::uint32_t) (value)) >> 8) & 0xFF);
+                main_memory[(p_addr + 2) - 0x0C000000] = ((((std::uint32_t) (value)) >> 16) & 0xFF);
+                main_memory[(p_addr + 3) - 0x0C000000] = ((((std::uint32_t) (value)) >> 24) & 0xFF);
             }
             else
             {
