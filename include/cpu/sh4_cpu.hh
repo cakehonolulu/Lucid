@@ -297,6 +297,9 @@ public:
 	void set_tbit(std::uint8_t tbit_);
 	std::uint8_t get_tbit();
 
+    void set_dbr(std::uint32_t dbr_);
+	std::uint32_t get_dbr();
+
 	void set_mmucr(std::uint32_t mmucr_);
 	std::uint32_t get_mmucr();
 

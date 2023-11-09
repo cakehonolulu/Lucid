@@ -221,6 +221,16 @@ std::uint8_t Sh4_Cpu::get_tbit()
     return (status_register & 0x01);
 }
 
+void Sh4_Cpu::set_dbr(std::uint32_t dbr_)
+{
+    debug_base_register = dbr_;
+}
+
+std::uint32_t Sh4_Cpu::get_dbr()
+{
+    return (debug_base_register);
+}
+
 void Sh4_Cpu::set_mmucr(std::uint32_t mmucr_)
 {
     mmucr = mmucr_;

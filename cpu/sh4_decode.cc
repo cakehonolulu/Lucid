@@ -308,6 +308,16 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     skip_pc_set = true;
                     break;
 
+                case 0b11111010:
+#ifdef DEBUG_INSTRUCTIONS
+                    std::cout << BOLDWHITE << "ldc r" << +(nnnn) << ", DBR" << RESET << "\n";
+#endif
+                    if (cpu->get_md_bit())
+                    {
+                        cpu->set_dbr(Rn());
+                    }
+                    break;
+
                 default:
                     std::cerr << BOLDRED << "parse_opcode: Unimplemented 0b0100 opcode variation 0x" << format("{:04X}", (opcode & 0x00FF)) << " (0b" << format("{:08b}", (opcode & 0x00FF)) << "), complete opcode: 0x" << format("{:04X}", opcode) << RESET << "\n";
                     cpu->print_registers();
