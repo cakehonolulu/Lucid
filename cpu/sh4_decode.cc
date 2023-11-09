@@ -66,7 +66,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                             std::cout << "pref @r" << +(nnnn) << std::endl;
 #endif
-                            std::cout << BOLDYELLOW << "parse_opcode: pref instruction detected, cached address is 0x" << format("{:08X}", GET_REG(nnnn)) << RESET << std::endl;
+                            std::cout << BOLDYELLOW << "parse_opcode: pref instruction detected, cached address is 0x" << format("{:08X}", Rn()) << RESET << std::endl;
                             break;
 
                         default:
@@ -107,7 +107,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                             std::cout << BOLDWHITE << "sts macl, r" << +(nnnn) << "\n";
 #endif
-                            SET_REG(nnnn, cpu->get_macl());
+                            Rn(cpu->get_macl());
                             break;
 
                         default:
@@ -137,7 +137,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
             std::cout << "mov.l r" << +(mmmm) << ",@(" << +(dddd << 2) << ",r" << +(nnnn) << ")" << std::endl;
 #endif
-            memory->write<uint32_t>(((dddd << 2) + GET_REG(nnnn)), GET_REG(mmmm), cpu);
+            memory->write<uint32_t>(((dddd << 2) + Rn()), Rm(), cpu);
             break;
 
         /*
@@ -152,21 +152,21 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.b r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
 #endif
-                    memory->write(GET_REG(nnnn), (std::uint8_t) GET_REG(mmmm), cpu);
+                    memory->write(Rn(), (std::uint8_t) Rm(), cpu);
                     break;
                 
                 case 0b0001:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
 #endif
-                    memory->write(GET_REG(nnnn), (std::uint16_t) GET_REG(mmmm), cpu);
+                    memory->write(Rn(), (std::uint16_t) Rm(), cpu);
                     break;
 
                 case 0b0010:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.l r" << +(mmmm) << ",@r" << +(nnnn) << RESET << "\n";
 #endif
-                    memory->write(GET_REG(nnnn), (std::uint32_t) GET_REG(mmmm), cpu);
+                    memory->write(Rn(), (std::uint32_t) Rm(), cpu);
                     break;
                 
                 case 0b0101:
@@ -174,9 +174,9 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.w r" << +(mmmm) << ",@-r" << +(nnnn) << RESET << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(nnnn) - 2);
-                    std::uint32_t dst = GET_REG(nnnn);
-                    std::uint16_t src = GET_REG(mmmm);
+                    Rn(Rn() - 2);
+                    std::uint32_t dst = Rn();
+                    std::uint16_t src = Rm();
                     memory->write(dst, src, cpu);
                     break;
                 }
@@ -185,14 +185,14 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "tst r" << +(mmmm) << ", r" << +(nnnn) << "\n";
 #endif
-                    SET_TBIT(GET_REG(mmmm) & GET_REG(nnnn) ? 0 : 1);
+                    SET_TBIT(Rm() & Rn() ? 0 : 1);
                     break;
 
                 case 0b1010:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "xor r" << +(mmmm) << ", r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(mmmm) ^ GET_REG(nnnn));
+                    Rn(Rm() ^ Rn());
                     break;
 
                 case 0b1110:
@@ -200,7 +200,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mulu.w r" << +(mmmm) << ", r" << +(nnnn) << "\n";
 #endif
-                    std::uint32_t macl_ = (std::uint32_t) ((GET_REG(mmmm) & 0xFFFF) * (GET_REG(nnnn) & 0xFFFF));
+                    std::uint32_t macl_ = (std::uint32_t) ((Rm() & 0xFFFF) * (Rn() & 0xFFFF));
                     cpu->set_macl(macl_);
                     break;
                 }
@@ -226,7 +226,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << "cmp/hi r" << +(mmmm) << ",r" << +(nnnn) << std::endl;
 #endif
-                    SET_TBIT(GET_REG(nnnn) > GET_REG(mmmm) ? 1 : 0);
+                    SET_TBIT(Rn() > Rm() ? 1 : 0);
                     break;
 
                 default:
@@ -249,54 +249,54 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "shlr r" << +(nnnn) << "\n";
 #endif
-                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
-                    SET_REG(nnnn, (GET_REG(nnnn) >> 1));
+                    SET_TBIT(Rn() & 0x00000001);
+                    Rn((Rn() >> 1));
                     break;
 
                 case 0b00000101:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "rotr r" << +(nnnn) << "\n";
 #endif
-                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
-                    SET_REG(nnnn, (GET_REG(nnnn) >> 1));
-                    SET_REG(nnnn, GET_REG(nnnn) | (GET_TBIT() << 31));
+                    SET_TBIT(Rn() & 0x00000001);
+                    Rn((Rn() >> 1));
+                    Rn(Rn() | (GET_TBIT() << 31));
                     break;
                 
                 case 0b00001001:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "shlr2 r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(nnnn) >> 2);
+                    Rn(Rn() >> 2);
                     break;
                 
                 case 0b00010000:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "dt r" << +(nnnn) << std::endl;
 #endif
-                    SET_REG(nnnn, GET_REG(nnnn) - 1);
-                    SET_TBIT(GET_REG(nnnn) == 0 ? 1 : 0);
+                    Rn(Rn() - 1);
+                    SET_TBIT(Rn() == 0 ? 1 : 0);
                     break;
 
                 case 0b00011000:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "shll8 r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(nnnn) << 8);
+                    Rn(Rn() << 8);
                     break;
                     
                 case 0b00100001:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "shar r" << +(nnnn) << "\n";
 #endif
-                    SET_TBIT(GET_REG(nnnn) & 0x00000001);
-                    SET_REG(nnnn, (((std::int32_t) GET_REG(nnnn)) >> 1));
+                    SET_TBIT(Rn() & 0x00000001);
+                    Rn((((std::int32_t) Rn()) >> 1));
                     break;
 
                 case 0b00101000:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "shll16 r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(nnnn) << 16);
+                    Rn(Rn() << 16);
                     break;
 
                 case 0b00101011:
@@ -304,7 +304,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
                     std::cout << BOLDWHITE << "jmp @r" << +(nnnn) << "\n";
 #endif
                     SET_PC(GET_DELAY_PC());
-                    SET_DELAY_PC(GET_REG(nnnn));
+                    SET_DELAY_PC(Rn());
                     skip_pc_set = true;
                     break;
 
@@ -327,11 +327,11 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             std::cout << "mov.l @(" << +(dddd << 2) << ",r" << +(mmmm) << "),r" << +(nnnn) << std::endl;
 #endif
 
-            std::uint32_t addr =  (GET_REG(mmmm) + (dddd << 2));
+            std::uint32_t addr =  (Rm() + (dddd << 2));
 
-            std::uint32_t value = memory->read<uint32_t>((GET_REG(mmmm) + (dddd << 2)), cpu);
+            std::uint32_t value = memory->read<uint32_t>((Rm() + (dddd << 2)), cpu);
 
-            SET_REG(nnnn, value);
+            Rn(value);
 
             break;
         }
@@ -348,45 +348,45 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.l @r" << +(mmmm) << ",r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, memory->read<uint32_t>(GET_REG(mmmm), cpu));
+                    Rn(memory->read<uint32_t>(Rm(), cpu));
                     break;
 
                 case 0b0011:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov r" << +(mmmm) << ",r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, GET_REG(mmmm));
+                    Rn(Rm());
                     break;
 
                 case 0b0101:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.w @r" << +(mmmm) << "+,r" << +(nnnn) << std::endl;
 #endif
-                    SET_REG(nnnn, memory->read<uint16_t>(GET_REG(mmmm), cpu));
-                    SET_REG(mmmm, GET_REG(mmmm) + 2);
+                    Rn(memory->read<uint16_t>(Rm(), cpu));
+                    Rm(Rm() + 2);
                     break;
 
                 case 0b0110:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "mov.l @+r" << +(mmmm) << ",r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, memory->read<std::uint32_t>(GET_REG(mmmm), cpu));
-                    SET_REG(mmmm, (GET_REG(mmmm) + 4));
+                    Rn(memory->read<std::uint32_t>(Rm(), cpu));
+                    Rm((Rm() + 4));
                     break;
 
                 case 0b1000:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "swap.b r" << +(mmmm) << ",r" << +(nnnn) << std::endl;
 #endif
-                    SET_REG(nnnn, (GET_REG(mmmm) & 0xFFFF0000) | ((GET_REG(mmmm) & 0x0000FF00) >> 8)
-                                    |((GET_REG(mmmm) & 0x000000FF) << 8));
+                    Rn((Rm() & 0xFFFF0000) | ((Rm() & 0x0000FF00) >> 8)
+                                    |((Rm() & 0x000000FF) << 8));
                     break;
 
                 case 0b1001:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << BOLDWHITE << "swap.w r" << +(mmmm) << ",r" << +(nnnn) << "\n";
 #endif
-                    SET_REG(nnnn, (GET_REG(mmmm) >> 16) | (GET_REG(mmmm) << 16));
+                    Rn((Rm() >> 16) | (Rm() << 16));
                     break;
 
                 default:
@@ -408,7 +408,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
             std::cout << "add #" << +((std::int32_t) imm) << ",r" << +(nnnn) << std::endl;
 #endif
 
-            SET_REG(nnnn, GET_REG(nnnn) + ((std::int32_t) imm));
+            Rn(Rn() + ((std::int32_t) imm));
 
             break;
         }
@@ -425,14 +425,14 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << "mov.w r0,@(" << +(dddd << 1) << ",r" << +(mmmm) << ")" << std::endl;
 #endif
-                    memory->write((GET_REG(mmmm) + (dddd << 1)), (std::uint16_t) (GET_REG(0) & 0xFFFF), cpu);
+                    memory->write((Rm() + (dddd << 1)), (std::uint16_t) (GET_REG(0) & 0xFFFF), cpu);
                     break;
 
                 case 0b0101:
 #ifdef DEBUG_INSTRUCTIONS
                     std::cout << "mov.w @(" << +(dddd << 1) << ",r" << +(mmmm) << "),r0" << std::endl;
 #endif
-                    SET_REG(0, ((dddd << 1) + GET_REG(mmmm)));
+                    SET_REG(0, ((dddd << 1) + Rm()));
                     break;
 
                 case 0b1001:
@@ -523,7 +523,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
             std::cout << "mov.l @(" << +(dddd) << ",pc),r" << +(nnnn) << std::endl;
 #endif
-            SET_REG(nnnn, memory->read<std::uint32_t>(((dddd << 2) + 4) + (GET_PC() & 0xFFFFFFFC), cpu));
+            Rn(memory->read<std::uint32_t>(((dddd << 2) + 4) + (GET_PC() & 0xFFFFFFFC), cpu));
             break;
 
         /*
@@ -535,7 +535,7 @@ void Sh4_Decode::parse_opcode(uint16_t opcode)
 #ifdef DEBUG_INSTRUCTIONS
             std::cout << BOLDWHITE << "mov #" << +(imm) << ", r" << +(nnnn) << "\n";
 #endif
-            SET_REG(nnnn, (std::int32_t) imm);
+            Rn((std::int32_t) imm);
             break;
 
         default:

@@ -17,6 +17,16 @@
 #define GET_TBIT()          (cpu->get_tbit())
 #define SET_TBIT(val)       (cpu->set_tbit(val))
 
+#define Rn1()          cpu->get_register(nnnn)
+#define Rn2(val)     cpu->set_register(nnnn, val)
+
+#define Rm1()          cpu->get_register(mmmm)
+#define Rm2(val)     cpu->set_register(mmmm, val)
+
+#define GET_MACRO(_0, _1, NAME, ...) NAME
+#define Rn(...) GET_MACRO(_0 __VA_OPT__(,) __VA_ARGS__,  Rn2, Rn1)(__VA_ARGS__)
+#define Rm(...) GET_MACRO(_0 __VA_OPT__(,) __VA_ARGS__,  Rm2, Rm1)(__VA_ARGS__)
+
 class Sh4_Decode {
 
 private:
