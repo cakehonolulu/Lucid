@@ -13,3 +13,9 @@ _deps
 *.bin
 .vscode/
 lucid
+
+.cmake/
+.idea/
+ninja_deps
+ninja_log
+build.ninja
