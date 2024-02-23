@@ -8,9 +8,9 @@
 
 int main(int argc, char **argv)
 {
-    const std::string bios_arg = "-bios", flash_arg = "-flash";
-    std::string bios_file, flash_file;
-    bool load_bios = false, load_flash = false;
+    const std::string bios_arg = "-bios", flash_arg = "-flash", binary_arg = "-bin";
+    std::string bios_file, flash_file, binary_file;
+    bool load_bios = false, load_flash = false, load_binary = false;
 
     if (argc < 2)
     {
@@ -49,6 +49,20 @@ int main(int argc, char **argv)
                     return 1;
                 }
             }
+            else if (binary_arg.compare(argv[i]) == 0)
+            {
+                if (argv[i + 1] != NULL)
+                {
+                    binary_file = argv[i + 1];
+                    i++;
+                    load_binary = true;
+                }
+                else
+                {
+                    std::cerr << "No binary file provided\n";
+                    return 1;
+                }
+            }
         }
     }
 
@@ -69,6 +83,13 @@ int main(int argc, char **argv)
     }
 
     if (load_flash) memory.load_flash(flash_file);
+
+    if (load_binary)
+    {
+        memory.load_binary(binary_file);
+        cpu.set_pc(0x00200000);
+        cpu.set_delay_pc(0x00200000 + 2);
+    }
 
     std::cout << "Memory Map Initialized" << std::endl;
 
