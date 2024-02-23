@@ -29,6 +29,7 @@ public:
 
     void load_bios(const std::string& bios_path);
     void load_flash(const std::string& flash_path);
+    void load_binary(const std::string& binary_path);
 
     void dump_ram();
     
@@ -114,6 +115,7 @@ public:
         else
         {
             std::cout << BOLDRED "memory_read: Unhandled read at address 0x" << format("{:08X}", p_addr) << " (Virtual: 0x" << format("{:08X}", address) << ")" << RESET << "\n";
+            cpu->print_registers();
             exit(1);
         }
 

@@ -83,6 +83,33 @@ void Memory :: load_flash(const std::string& flash_path)
 	flash_file.close();
 }
 
+void Memory :: load_binary(const std::string& binary_path)
+{
+    std::ifstream binary_file(binary_path, std::ios::binary);
+
+    if (!binary_file.is_open()) {
+        std::cerr << BOLDRED << "Failed to open the binary file: " << binary_path << RESET << "\n";
+        return;
+    }
+    else
+    {
+        std::cout << BOLDBLUE << "Binary file opened successfully...!" << RESET "\n";
+    }
+
+    const uint32_t binary_base_addr = 0x00000000;
+    const uint32_t binary_end_addr = binary_base_addr + 0x0003FFFF;
+    uint32_t offset = binary_base_addr;
+
+    while (!binary_file.eof() && offset <= binary_end_addr) {
+        char byte;
+        binary_file.read(&byte, 1);
+        flash[offset] = static_cast<uint8_t>(byte);
+        offset++;
+    }
+
+    binary_file.close();
+}
+
 void Memory :: dump_ram()
 {
 	std::ofstream ram_file("ram.bin", std::ios::out | std::ios::binary);
