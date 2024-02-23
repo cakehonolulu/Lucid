@@ -211,6 +211,16 @@ std::uint32_t Sh4_Cpu::get_macl()
     return macl;
 }
 
+void Sh4_Cpu::set_pr(std::uint32_t pr_)
+{
+    procedure_register = pr_;
+}
+
+std::uint32_t Sh4_Cpu::get_pr()
+{
+    return procedure_register;
+}
+
 void Sh4_Cpu::set_tbit(std::uint8_t tbit_)
 {
     status_register = (status_register & 0xFFFFFFFE) | (tbit_ & 0x01);
