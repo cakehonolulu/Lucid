@@ -19,3 +19,4 @@ lucid
 ninja_deps
 ninja_log
 build.ninja
+*.ninja*
